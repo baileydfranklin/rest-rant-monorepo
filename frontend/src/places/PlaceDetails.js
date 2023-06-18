@@ -1,13 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useHistory, useParams } from "react-router"
 import CommentCard from './CommentCard'
 import NewCommentForm from "./NewCommentForm";
+// import { useHistory } from "react-router"
+import { CurrentUser } from "../contexts/CurrentUser"
 
 function PlaceDetails() {
 
 	const { placeId } = useParams()
 
 	const history = useHistory()
+
+	const { setCurrentUser } = useContext(CurrentUser)
 
 	const [place, setPlace] = useState(null)
 
@@ -96,11 +100,30 @@ function PlaceDetails() {
 		)
 		comments = place.comments.map(comment => {
 			return (
-				<CommentCard key={comment.commentId} comment={comment} onDelete={() => deleteComment(comment)} />
+				<CommentCard
+					key={comment.commentId}
+					comment={comment}
+					onDelete={() => deleteComment(comment)}
+				/>
 			)
 		})
 	}
 
+	let placeActions = null
+	let currentUser
+
+if (currentUser?.role === 'admin') {
+placeActions = (
+	<>
+		<a className="btn btn-warning" onClick={editPlace}>
+			Edit
+		</a>
+		<button type="submit" className="btn btn-danger" onClick={deletePlace}>
+			Delete
+		</button>
+	</>
+)
+}
 
 	return (
 		<main>
@@ -128,6 +151,7 @@ function PlaceDetails() {
 						Serving {place.cuisines}.
 					</h4>
 					<br />
+					{placeActions}
 					<a className="btn btn-warning" onClick={editPlace}>
 						Edit
 					</a>{` `}
